@@ -10,51 +10,57 @@
 	<body ng-app="shiftArrangement">
 
 		<div ng-controller="MainController">
-			<div class="datepickerdemoBasicUsage" ng-cloak="">
-				<div flex-gt-xs>
-			        <h4>Start Date</h4>
-			        <md-datepicker ng-model="startDate" md-placeholder="Enter date"></md-datepicker>
-		        </div>
-		        {{startDate}}
-		        <div flex-gt-xs>
-			        <h4>End Date</h4>
-			        <md-datepicker ng-model="endDate" md-placeholder="Enter date"></md-datepicker>
-		        </div>
-		        {{endDate}}
-		    </div>
-		    <div ng-cloak="" class="buttondemoBasicUsage">
-		    	 <md-button ng-click="getInterval()">Confirm</md-button>
-		    </div>
-		    <div class="md-padding checkboxdemoSyncing" ng-cloak="">
-		    	<div flex="100" flex-gt-sm="50" layout="column">
-			      <div>
-			        
-			        <div class="standard">
-			         
-			          <div layout="row" layout-wrap="" flex="">
-			            <div flex="50" ng-repeat="date in dateInterval">
-			              <md-checkbox ng-checked="exists(date, selectedDate)" ng-click="toggle(date, selectedDate)">
-			                {{ date |date }} <span ng-if="exists(date, selectedDate)">selected</span>
-			              </md-checkbox>
-			            </div>
-			          </div>
+
+			<div ng-init="datePicker=''" class={{datePicker}}>
+				<div class="datepickerdemoBasicUsage" ng-cloak="">
+					<div flex-gt-xs>
+				        <h4>Start Date</h4>
+				        <md-datepicker ng-model="startDate" md-placeholder="Enter date"></md-datepicker>
 			        </div>
-			      </div>
+			        {{startDate}}
+			        <div flex-gt-xs>
+				        <h4>End Date</h4>
+				        <md-datepicker ng-model="endDate" md-placeholder="Enter date"></md-datepicker>
+			        </div>
+			        {{endDate}}
 			    </div>
-			</div>
-			<div flex="100">
-		      <h2 class="md-title">Selected Items</h2>
-		      <code style="display: block; padding: 8px;">{{selectedDate | json}}</code>
+			    <div ng-cloak="" class="buttondemoBasicUsage">
+			    	 <md-button ng-click="getInterval();">Confirm</md-button>
+			    </div>
 		    </div>
-		    <div ng-cloak="" class="buttondemoBasicUsage">
-		    	 <md-button ng-click="confirmDate()">Confirm</md-button>
+		    <div ng-init="checkbox=''" class={{checkbox}}>
+			    <div class="md-padding checkboxdemoSyncing" ng-cloak="">
+			    	<div flex="100" flex-gt-sm="50" layout="column">
+				      <div>
+				        
+				        <div class="standard">
+				         
+				          <div layout="row" layout-wrap="" flex="">
+				            <div flex="50" ng-repeat="date in dateInterval">
+				              <md-checkbox ng-checked="exists(date, selectedDates)" ng-click="toggle(date, selectedDates)">
+				                {{ date |date }} <span ng-if="exists(date, selectedDates)">selected</span>
+				              </md-checkbox>
+				            </div>
+				          </div>
+				        </div>
+				      </div>
+				    </div>
+				</div>
+				<div flex="100">
+			      <h2 class="md-title">Selected Items</h2>
+			      <code style="display: block; padding: 8px;">{{selectedDates | json}}</code>
+			    </div>
+			    <div ng-cloak="" class="buttondemoBasicUsage">
+			    	 <md-button ng-click="confirmDate()">Confirm</md-button>
+			    </div>
 		    </div>
 			    <ul>
-			        <li ng-repeat="x in excos">
-			        	{{x}}
-			        	{{apple.name}}
+			        <li ng-repeat="exco in excos">
+			        	{{exco.name}}
 			        	<span ng-click="removeItem($index)">&times;</span>
-
+			        	<div ng-cloak="" class="buttondemoBasicUsage" ng-repeat="(time,availability) in exco.avail">
+		    	 			<md-button ng-click="disAvailToggle($parent.$index, time)">{{time}}</md-button>
+		    			</div>
 			        </li>
 			    </ul>
 		    <input ng-model="addMe">
