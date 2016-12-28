@@ -1,4 +1,7 @@
 app.controller("MainController", function($scope) {
+	$scope.datePicker = false;
+	$scope.alwaysTrue = true;
+	
 	function Exco(name){
 		this.name = name;
 		this.avail = {};
@@ -6,16 +9,21 @@ app.controller("MainController", function($scope) {
 		this.shiftAvailable = 0;
 		//initialize all timeslots for each exco to be true
 
-		//below are commented out for testing
-		// for (var key in $scope.timeslot){
+		
+		for (var key in $scope.timeslot){
 
-		// 	this.avail[key] = true;
-		// }
-		// console.log(this.avail)
+			this.avail[key] = true;
+			this.shiftAvailable += 1;
+    		$scope.timeslot[key] += 1;
+
+		}
+		console.log(this.shiftAvailable);
 	};
 
 	$scope.getInterval = function(){
-		$scope.datePicker = "ng-hide";
+		$scope.datepick = true;
+		$scope.checkbox = true;
+
 	  	if (!$scope.startDate || !$scope.endDate){
 	  		console.log("null");
 	  		return null;
@@ -80,7 +88,9 @@ app.controller("MainController", function($scope) {
   	};
 
   	$scope.confirmDate = function(){
-  		$scope.checkbox = "ng-hide";
+
+  		$scope.checkbox = false;
+  		$scope.addExco = true;
 	  	$scope.selectedDates.sort(function(a,b){
 		  // Turn your strings into dates, and then subtract them
 		  // to get a value that is either negative, positive, or zero.
@@ -115,67 +125,75 @@ app.controller("MainController", function($scope) {
 		console.log(excoIndex,time, $scope.excos[excoIndex]);
     	if ($scope.excos[excoIndex].avail[time]) {
     		$scope.excos[excoIndex].avail[time] = false;
+    		$scope.excos[excoIndex].shiftAvailable -= 1;
+    		$scope.timeslot[time] -= 1;
     	}
     	else{
     		$scope.excos[excoIndex].avail[time]  = true;
+    		$scope.excos[excoIndex].shiftAvailable += 1;
+    		$scope.timeslot[time] += 1;
     	}
         console.log($scope.excos[excoIndex].avail);
+        console.log($scope.timeslot);
     };
 
-    var dates = [];
-    	for (var i =0; i<4; i++){
-	    	var day = new Date();
-	    	day.setDate(day.getDate()+i);
-	    	day.setHours(9,0,0,0);
-	    	dates.push(day);
-	    }
+ //    var dates = [];
+ //    	for (var i =0; i<4; i++){
+	//     	var day = new Date();
+	//     	day.setDate(day.getDate()+i);
+	//     	day.setHours(9,0,0,0);
+	//     	dates.push(day);
+	//     }
 
-	    console.log(dates);
-    $scope.testDates = dates;
+	//     console.log(dates);
+ //    $scope.testDates = dates;
     
 
 
 
-    ////////////////test//////////////////////////////////////////////////////////////////////////
-    var timeslot = {};
-	$scope.testDates.forEach(function (selectedDate){
-  		// console.log(selectedDate)
-  		var counter = 0;
-  		while (selectedDate.getHours() < 18){
-  			date = new Date(selectedDate);
+   
+ //    var timeslot = {};
+	// $scope.testDates.forEach(function (selectedDate){
+ //  		// console.log(selectedDate)
+ //  		var counter = 0;
+ //  		while (selectedDate.getHours() < 18){
+ //  			date = new Date(selectedDate);
 
-  			timeslot[date] = 0;
-  			// console.log($scope.timeslot);
-  			if (counter % 2 == 0) {
-  				selectedDate.setHours(selectedDate.getHours() +1);
-  			}
-  			else {
-  				selectedDate.setHours(selectedDate.getHours() +2);
-  			}
-  			counter++;
-  		}
+ //  			timeslot[date] = 0;
+ //  			// console.log($scope.timeslot);
+ //  			if (counter % 2 == 0) {
+ //  				selectedDate.setHours(selectedDate.getHours() +1);
+ //  			}
+ //  			else {
+ //  				selectedDate.setHours(selectedDate.getHours() +2);
+ //  			}
+ //  			counter++;
+ //  		}
   	
-  	});
-    $scope.timeslot = timeslot;
-    // console.log($scope.timeslot);
+ //  	});
+ //    $scope.timeslot = timeslot;
+ //    // console.log($scope.timeslot);
 
-    $scope.excos = [];
-    Math.seedrandom("rand");
-  	for(var i=0; i< 10; i++){
-		$scope.excos.push(new Exco(i));
-		for (var key in $scope.timeslot){
-			var ran = Math.random();
-			if (ran > 0.6){
-				$scope.excos[i].avail[key]	= true;
-				$scope.excos[i].shiftAvailable += 1;
-				$scope.timeslot[key] += 1;
-			}
-			else{
-				$scope.excos[i].avail[key]	= false;
-			}
-		}
-		// console.log($scope.excos[i].avail);
-  	}
+ //    $scope.excos = [];
+ //    Math.seedrandom(1);
+ //  	for(var i=0; i< 10; i++){
+	// 	$scope.excos.push(new Exco(i));
+	// 	for (var key in $scope.timeslot){
+	// 		var ran = Math.random();
+	// 		if (ran > 0.6){
+	// 			$scope.excos[i].avail[key]	= true;
+	// 			$scope.excos[i].shiftAvailable += 1;
+	// 			$scope.timeslot[key] += 1;
+	// 		}
+	// 		else{
+	// 			$scope.excos[i].avail[key]	= false;
+	// 		}
+	// 	}
+	// 	// console.log($scope.excos[i].avail);
+ //  	}
+
+
+
 
   	//return smallest value
   	var min = function(list){
@@ -238,19 +256,20 @@ app.controller("MainController", function($scope) {
   		var nextTimeslot = null;
   		for (var key in $scope.timeslot){
   			// console.log(key, $scope.assignment[key]);
-
-  			if($scope.assignment[key].size== 0){
-  				
-  				if( $scope.timeslot[key] < minAvailableExco){
-  					nextTimeslot = key;
-  					minAvailableExco = $scope.timeslot[key];
-  				}
-  				else if($scope.timeslot[key] == minAvailableExco){
-  					if (nextTimeslot == null){
-  						nextTimeslot = key;
-  					}
-  				}
-  			}
+  			if($scope.timeslot[key] > 0){
+	  			if($scope.assignment[key].size== 0){
+	  				
+	  				if( $scope.timeslot[key] < minAvailableExco){
+	  					nextTimeslot = key;
+	  					minAvailableExco = $scope.timeslot[key];
+	  				}
+	  				else if($scope.timeslot[key] == minAvailableExco){
+	  					if (nextTimeslot == null){
+	  						nextTimeslot = key;
+	  					}
+	  				}
+	  			}
+	  		}
   		}
   		// console.log("next",nextTimeslot);
   		return nextTimeslot;
@@ -288,7 +307,13 @@ app.controller("MainController", function($scope) {
   	};
 
   	$scope.assignment = {}
-  	var shiftArrangement = function(){
+  	$scope.shiftArrangement = function(){
+
+  		$scope.addExco = false;
+  		$scope.result = true;
+  		for(var i =0; i< $scope.excos.length; i++){
+  			console.log("exco",$scope.excos[i].name);
+  		}
   		for (var key in $scope.timeslot){
   			$scope.assignment[key] = new Set();
   		}
@@ -307,20 +332,26 @@ app.controller("MainController", function($scope) {
   				console.log(nextTimeslot,$scope.assignment[nextTimeslot].size);
   			}
   			nextTimeslot = getNextTimeslot();
+
   		}
+  		for (var key in $scope.timeslot){
+
+	  		console.log(key);
+	  		
+	  		for(let i of $scope.assignment[key]) { 
+	  			// console.log(i)
+	  			// console.log($scope.excos[i].name, $scope.excos[i].shiftAssigned, $scope.excos[i].shiftAvailable); 
+	  		}
+	  		$scope.assignment[key] = Array.from($scope.assignment[key]);
+	  		console.log($scope.assignment[key]);
+  		}
+
 
   	};
 
-  	shiftArrangement();
+   
 
-  	for (var key in $scope.timeslot){
-  		console.log(key);
-  		for(let i of $scope.assignment[key]) { 
-  			console.log($scope.excos[i].name, $scope.excos[i].shiftAssigned, $scope.excos[i].shiftAvailable); 
-  		}
-
-  		
-  	}
+  	
 
 });
 

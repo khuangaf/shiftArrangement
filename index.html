@@ -1,83 +1,88 @@
 <html>
 	<head>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 	    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
 	    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
 	    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
-	    
+	    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 	    <link rel="stylesheet" href="css/main.css" />
 	</head>
 	<body ng-app="shiftArrangement">
 
 		<div ng-controller="MainController">
-			<div>
-			<ul>
-				<li ng-repeat="date in testDates">
-				        	{{date}}
-				</li>
-			</ul>
-			<ul>
-				<li ng-repeat="(timeslot,value) in timeslot">
-				        	{{timeslot}} {{value}}
-				</li>
-			</ul>
-			</div>
-			<div ng-init="datePicker=''" class={{datePicker}}>
+			<div  ng-hide="datepick">
 				<div class="datepickerdemoBasicUsage" ng-cloak="">
 					<div flex-gt-xs>
 				        <h4>Start Date</h4>
 				        <md-datepicker ng-model="startDate" md-placeholder="Enter date"></md-datepicker>
 			        </div>
-			        {{startDate}}
+			        
 			        <div flex-gt-xs>
 				        <h4>End Date</h4>
 				        <md-datepicker ng-model="endDate" md-placeholder="Enter date"></md-datepicker>
 			        </div>
-			        {{endDate}}
+			        
 			    </div>
 			    <div ng-cloak="" class="buttondemoBasicUsage">
-			    	 <md-button ng-click="getInterval();">Confirm</md-button>
+			    	 <md-button ng-click="getInterval();" class="md-raised md-primary">Confirm</md-button>
 			    </div>
 		    </div>
-		    <div ng-init="checkbox=''" class={{checkbox}}>
+
+		    <div ng-show="checkbox">
 			    <div class="md-padding checkboxdemoSyncing" ng-cloak="">
 			    	<div flex="100" flex-gt-sm="50" layout="column">
-				      <div>
-				        
-				        <div class="standard">
-				         
+				        <div class="standard"> 
+				          <h4>Select the days you are arraging shifts.</h4>
 				          <div layout="row" layout-wrap="" flex="">
 				            <div flex="50" ng-repeat="date in dateInterval">
 				              <md-checkbox ng-checked="exists(date, selectedDates)" ng-click="toggle(date, selectedDates)">
-				                {{ date |date }} <span ng-if="exists(date, selectedDates)">selected</span>
+				                {{ date |date }}
 				              </md-checkbox>
 				            </div>
 				          </div>
 				        </div>
-				      </div>
 				    </div>
 				</div>
-				<div flex="100">
-			      <h2 class="md-title">Selected Items</h2>
-			      <code style="display: block; padding: 8px;">{{selectedDates | json}}</code>
-			    </div>
-			    <div ng-cloak="" class="buttondemoBasicUsage">
-			    	 <md-button ng-click="confirmDate()">Confirm</md-button>
-			    </div>
+				 <div ng-cloak="" class="buttondemoBasicUsage">
+			    	 <md-button ng-click="confirmDate()"  class="md-raised md-primary">Confirm</md-button>
+		    	 </div>	   
 		    </div>
+		    <div ng-show= "addExco">
+		    	<h4>Exco Availability</h4>
+		    	<h6>Adding excos by clicking on the add button.</h6>
+		    	<h6>Tap on the timeslot when the exco is not available.</h6>
 			    <ul>
 			        <li ng-repeat="exco in excos">
 			        	{{exco.name}}
 			        	<span ng-click="removeItem($index)">&times;</span>
 			        	<div ng-cloak="" class="buttondemoBasicUsage" ng-repeat="(time,availability) in exco.avail">
-		    	 			<md-button ng-click="disAvailToggle($parent.$index, time)">{{time}}</md-button>
+		    	 			<md-switch ng-model="alwaysTrue" ng-click="disAvailToggle($parent.$index, time)">{{time | dateTime}}
+		    	 			</md-switch>
 		    			</div>
 			        </li>
 			    </ul>
-		    <input ng-model="addMe">
-    		<button ng-click="addItem()">Add</button>
-    		<p>{{errortext}}</p>
+			    
+	    		<md-input-container><input ng-model="addMe"></md-input-container>
+	    		<md-button ng-click="addItem()"  class="md-raised md-primary">Add</md-button>
+	    		<p>{{errortext}}</p>
+	    		<div ng-cloak="" class="buttondemoBasicUsage">
+			    	 <md-button ng-click="shiftArrangement()"  class="md-raised md-warn">Arrange Shift</md-button>
+				</div>
+    		</div>
+    		<div ng-show="result">
+				<ul>
+					<li ng-repeat="(time, assignedExcos) in assignment">
+						{{time | dateTime}}
+						<ul>
+							<li ng-repeat="exco in assignedExcos">
+								{{exco}}
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 		</div>
 		
 			
@@ -87,11 +92,12 @@
 	
 	
 	<script src="js/app.js"></script>
-	<script src="js/controllers/MainController.js"></script>
+	
 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
-
+  <script src="js/controllers/MainController.js"></script>
+  <script src="js/filters/DateTime.js"></script>
   <!-- Angular Material Library -->
   <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
 </html>
