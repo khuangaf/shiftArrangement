@@ -2,12 +2,16 @@ app.controller("MainController", function($scope) {
 	function Exco(name){
 		this.name = name;
 		this.avail = {};
+		this.shiftAssigned = 0;
+		this.shiftAvailable = 0;
 		//initialize all timeslots for each exco to be true
-		for (var key in $scope.timeslot){
 
-			this.avail[key] = true;
-		}
-		console.log(this.avail)
+		//below are commented out for testing
+		// for (var key in $scope.timeslot){
+
+		// 	this.avail[key] = true;
+		// }
+		// console.log(this.avail)
 	};
 
 	$scope.getInterval = function(){
@@ -116,5 +120,208 @@ app.controller("MainController", function($scope) {
     		$scope.excos[excoIndex].avail[time]  = true;
     	}
         console.log($scope.excos[excoIndex].avail);
-    } 
+    };
+
+    var dates = [];
+    	for (var i =0; i<4; i++){
+	    	var day = new Date();
+	    	day.setDate(day.getDate()+i);
+	    	day.setHours(9,0,0,0);
+	    	dates.push(day);
+	    }
+
+	    console.log(dates);
+    $scope.testDates = dates;
+    
+
+
+
+    ////////////////test//////////////////////////////////////////////////////////////////////////
+    var timeslot = {};
+	$scope.testDates.forEach(function (selectedDate){
+  		// console.log(selectedDate)
+  		var counter = 0;
+  		while (selectedDate.getHours() < 18){
+  			date = new Date(selectedDate);
+
+  			timeslot[date] = 0;
+  			// console.log($scope.timeslot);
+  			if (counter % 2 == 0) {
+  				selectedDate.setHours(selectedDate.getHours() +1);
+  			}
+  			else {
+  				selectedDate.setHours(selectedDate.getHours() +2);
+  			}
+  			counter++;
+  		}
+  	
+  	});
+    $scope.timeslot = timeslot;
+    // console.log($scope.timeslot);
+
+    $scope.excos = [];
+    Math.seedrandom("rand");
+  	for(var i=0; i< 10; i++){
+		$scope.excos.push(new Exco(i));
+		for (var key in $scope.timeslot){
+			var ran = Math.random();
+			if (ran > 0.6){
+				$scope.excos[i].avail[key]	= true;
+				$scope.excos[i].shiftAvailable += 1;
+				$scope.timeslot[key] += 1;
+			}
+			else{
+				$scope.excos[i].avail[key]	= false;
+			}
+		}
+		// console.log($scope.excos[i].avail);
+  	}
+
+  	//return smallest value
+  	var min = function(list){
+  		if (list.length < 1) return null;
+  		if (list.length == 1) return list[0];
+  		var currentMin = list[0];
+  		for(i = 1; i < list.length; i++){
+  			if (currentMin > list[i]) {
+  				currentMin = list[i]
+  			}
+  		}
+  		return currentMin;
+  	};
+
+  	//return largest value
+  	var max = function(list){
+  		if (list.length < 1) return null;
+  		if (list.length == 1) return list[0];
+  		var currentMax = list[0];
+  		for(i = 1; i < list.length; i++){
+  			if (currentMax < list[i]) {
+  				currentMax = list[i]
+  			}
+  		}
+  		return currentMax;
+  	};
+
+	//return the key with the largest value  	
+  	var argMax = function(dict){
+  		var currentMax = -1000;
+  		var bestArg = null;
+  		for (var key in dict){
+  			if (dict[key] > currentMax){
+  				bestArg = key;
+  				currentMax = dict[key];
+  			}
+  		}
+  		return bestArg;
+  	};
+
+  	//return the key with the smallest value
+  	var argMin = function(dict){
+  		var currentMin = 100000;
+  		var bestArg = null;
+  		for (var key in dict){
+  			if (dict[key] < currentMin){
+  				bestArg = key;
+  				currentMin = dict[key];
+  			}
+  		}
+  		return bestArg;
+  	};
+  	
+  	
+
+  	//return the next timeslot to be assigned
+  	//return null if assigment is complete
+  	var getNextTimeslot = function(){
+  		var minAvailableExco = $scope.excos.length;
+  		var nextTimeslot = null;
+  		for (var key in $scope.timeslot){
+  			// console.log(key, $scope.assignment[key]);
+
+  			if($scope.assignment[key].size== 0){
+  				
+  				if( $scope.timeslot[key] < minAvailableExco){
+  					nextTimeslot = key;
+  					minAvailableExco = $scope.timeslot[key];
+  				}
+  				else if($scope.timeslot[key] == minAvailableExco){
+  					if (nextTimeslot == null){
+  						nextTimeslot = key;
+  					}
+  				}
+  			}
+  		}
+  		// console.log("next",nextTimeslot);
+  		return nextTimeslot;
+  	};
+
+  	//return the index of the next exco to be assigned
+  	var getNextExcoIndex = function(timeslot){
+  		var nextIndex = null
+  		console.log($scope.excos.length);
+  		for (var index in $scope.excos){
+  			//current exco is available during the current timeslot
+  			// console.log($scope.excos[index].avail[timeslot]);
+  			if($scope.excos[index].avail[timeslot]){
+  				// console.log("avail");
+  				//current timeslot is not assigned the current exco.
+	  			if (!$scope.assignment[timeslot].has($scope.excos[index].name)){
+	  				
+	  				if (nextIndex == null){
+	  					nextIndex = index;
+	  				}
+	  				else if($scope.excos[index].shiftAvailable < $scope.excos[nextIndex].shiftAvailable){
+	  					nextIndex = index;
+	  				}
+	  				else if($scope.excos[index].shiftAvailable == $scope.excos[nextIndex].shiftAvailable){
+	  					if($scope.excos[index].shiftAssigned < $scope.excos[nextIndex].shiftAssigned){
+	  						nextIndex = index;
+	  					}
+	  				}
+	  			}	
+  			}
+  			
+  			
+  		}
+  		return nextIndex;
+  	};
+
+  	$scope.assignment = {}
+  	var shiftArrangement = function(){
+  		for (var key in $scope.timeslot){
+  			$scope.assignment[key] = new Set();
+  		}
+  		var nextTimeslot = getNextTimeslot();
+  		console.log(nextTimeslot);
+  		while(nextTimeslot != null){
+  			console.log("n",nextTimeslot);
+  			// console.log($scope.assignment[nextTimeslot].size);
+  			// console.log($scope.timeslot[nextTimeslot]);
+  			while($scope.assignment[nextTimeslot].size < min([3,$scope.timeslot[nextTimeslot]])){
+  				var nextExcoIndex = getNextExcoIndex(nextTimeslot);
+  				console.log(nextExcoIndex);
+  				if (nextExcoIndex == null) break;
+  				$scope.excos[nextExcoIndex].shiftAssigned += 1;
+  				$scope.assignment[nextTimeslot].add($scope.excos[nextExcoIndex].name);
+  				console.log(nextTimeslot,$scope.assignment[nextTimeslot].size);
+  			}
+  			nextTimeslot = getNextTimeslot();
+  		}
+
+  	};
+
+  	shiftArrangement();
+
+  	for (var key in $scope.timeslot){
+  		console.log(key);
+  		for(let i of $scope.assignment[key]) { 
+  			console.log($scope.excos[i].name, $scope.excos[i].shiftAssigned, $scope.excos[i].shiftAvailable); 
+  		}
+
+  		
+  	}
+
 });
+
+
