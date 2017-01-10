@@ -1,7 +1,7 @@
 app.filter('dateTime', function() {
     return function(x) {
         x = new Date(x);
-        var month = x.getMonth();
+        var month = x.getMonth()+1;
         var date = x.getDate();
         var hour = x.getHours();
         var nextHour = hour;
@@ -22,5 +22,6 @@ app.filter('dateTime', function() {
             hour = "0" + hour;
         }
         return month + "/" + date + " "+ hour + ":" + min + " - " + nextHour + ":" + nextMin;
+        console.log(month);
     };
 });

@@ -49,6 +49,22 @@
 			    	 <md-button ng-click="confirmDate()"  class="md-raised md-primary">Confirm</md-button>
 		    	 </div>	   
 		    </div>
+
+		    <div ng-show="selectExcoNumber">
+		    	<md-input-container>
+		          <label>Maximum Number of Excos/ Shift</label>
+		          <md-select ng-model="maxExcoNumber">
+		            
+		            <md-option ng-repeat="maxExcoNumber in numberOfExcos" value="{{maxExcoNumber}}">
+		              {{maxExcoNumber}}
+		            </md-option>
+		          </md-select>
+		        </md-input-container>
+		        <div ng-cloak="" class="buttondemoBasicUsage">
+			    	 <md-button ng-click="confirmNumberOfExco()"  class="md-raised md-primary">Confirm</md-button>
+		    	 </div>	
+		    </div>
+
 		    <div ng-show= "addExco">
 		    	<h4>Exco Availability</h4>
 		    	<h6>Adding excos by clicking on the add button.</h6>
@@ -56,7 +72,8 @@
 			    <ul>
 			        <li ng-repeat="exco in excos">
 			        	{{exco.name}}
-			        	<span ng-click="removeItem($index)">&times;</span>
+			        	
+			        	<md-icon md-svg-src="/delete.svg" aria-label="android " ng-click="removeItem($index)"></md-icon>
 			        	<div ng-cloak="" class="buttondemoBasicUsage" ng-repeat="(time,availability) in exco.avail">
 		    	 			<md-switch ng-model="alwaysTrue" ng-click="disAvailToggle($parent.$index, time)">{{time | dateTime}}
 		    	 			</md-switch>
@@ -71,17 +88,21 @@
 			    	 <md-button ng-click="shiftArrangement()"  class="md-raised md-warn">Arrange Shift</md-button>
 				</div>
     		</div>
+
     		<div ng-show="result">
-				<ul>
-					<li ng-repeat="(time, assignedExcos) in assignment">
-						{{time | dateTime}}
-						<ul>
-							<li ng-repeat="exco in assignedExcos">
-								{{exco}}
-							</li>
-						</ul>
-					</li>
-				</ul>
+				
+				<md-list>
+					<md-list-item  ng-repeat="(time, assignedExcos) in assignment">
+			          	<h3 class="md-list-item-text">{{time | dateTime}}</h3>
+			          	<md-list>
+			          		<md-list-item  ng-repeat="exco in assignedExcos">
+			          			<h4>{{exco}}</h4>
+			          		</md-list-item>
+			          	</md-list>
+			          <md-divider ng-if="!$last"></md-divider>
+			          <!-- <a href="{{bookmark.url}}">{{bookmark.title}}</a> -->
+			        </md-list-item>
+		        </md-list>
 			</div>
 		</div>
 		
